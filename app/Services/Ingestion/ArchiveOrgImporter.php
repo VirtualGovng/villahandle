@@ -6,13 +6,9 @@ use App\Models\Movie;
 
 class ArchiveOrgImporter implements ImporterInterface
 {
-    // --- THIS IS THE DEFINITIVE, TESTED, AND WORKING API URL ---
-    // It specifically targets the "publicdomainfeaturefilms" collection.
-    protected string $apiUrl = "https://archive.org/advancedsearch.php?q=collection%3A(publicdomainfeaturefilms)+AND+mediatype%3A(movies)&fl%5B%5D=description,identifier,title,publicdate&rows=50&output=json";
-    // --- END OF FIX ---
-
+    protected string $apiUrl = "https://archive.org/advancedsearch.php?q=collection%3A(publicdomainfeaturefilms)+AND+mediatype%3A(movies)&fl%5B%5D=description,identifier,title,publicdate&rows=50&page=1&output=json";
     protected Movie $movieModel;
-    protected string $webserverUser = 'villa3853'; // Change if your user is different
+    protected string $webserverUser = 'villa3 ઉ853';
 
     public function __construct()
     {
@@ -22,7 +18,6 @@ class ArchiveOrgImporter implements ImporterInterface
     public function fetch(): array
     {
         echo "Fetching movie list from Internet Archive (Public Domain Feature Films)...\n";
-        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
