@@ -1,8 +1,8 @@
 <?php
 
-namespace App-Services-Ingestion;
+namespace App\Services\Ingestion;
 
-use App-Models-Movie;
+use App\Models\Movie;
 
 class JsonImporter implements ImporterInterface
 {
@@ -41,7 +41,6 @@ class JsonImporter implements ImporterInterface
         
         $metaUrl = "https://archive.org/metadata/{$identifier}";
         
-        // --- THIS IS THE FIX: Use cURL for ALL API calls ---
         $ch_meta = curl_init();
         curl_setopt($ch_meta, CURLOPT_URL, $metaUrl);
         curl_setopt($ch_meta, CURLOPT_RETURNTRANSFER, true);
@@ -54,7 +53,6 @@ class JsonImporter implements ImporterInterface
             return;
         }
         $metaData = json_decode($metaResponse, true);
-        // --- END OF FIX ---
 
         $description = $metaData['metadata']['description'][0] ?? $metaData['metadata']['notes'][0] ?? 'No description available.';
         $release_date_str = $metaData['metadata']['publicdate'][0] ?? $metaData['created'] ?? 'now';
