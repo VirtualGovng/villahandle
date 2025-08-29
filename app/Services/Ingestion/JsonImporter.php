@@ -59,14 +59,28 @@ class JsonImporter implements ImporterInterface
         $release_date = date('Y-m-d', strtotime($release_date_str));
 
         // --- THIS IS THE DEFINITIVE FIX ---
-        // We now loop through the indexed array correctly and check the 'name' key inside each object.
+        // The Internet Archive API returns the 'files' array in two different structures.
+        // This code now handles BOTH possible structures.
         $videoUrl = null;
         if (isset($metaData['files'])) {
-            foreach ($metaData['files'] as $fileInfo) { // Correctly loop through the indexed array
-                // Check if the 'name' key exists and ends with .mp4
-                if (isset($fileInfo['name']) && str_ends_with(strtolower($fileInfo['name']), '.mp4')) {
-                    $videoUrl = "https://archive.org/download/{$identifier}" . $fileInfo['name'];
-                    break; // We found our video, stop looking.
+            // Heuristic: Check if the first key is numeric (0). If so, it's an indexed array.
+            if (isset($metaData['files'][0])) { 
+                // Handle Structure 1: Indexed Array (like for 'His Girl Friday')
+                // [ { "name": "/file.mp4", ... }, { ... } ]
+                foreach ($metaData['files'] as $fileInfo) {
+                    if (isset($fileInfo['name']) && str_ends_with(strtolower($fileInfo['name']), '.mp4')) {
+                        $videoUrl = "https://archive.org/download/{$identifier}" . $fileInfo['name'];
+                        break;
+                    }
+                }
+            } else {
+                // Handle Structure 2: Associative Array (like for 'Night of the Living Dead')
+                // { "/file.mp4": { ... }, "/file.jpg": { ... } }
+                foreach ($metaData['files'] as $fileName => $fileInfo) {
+                    if (str_ends_with(strtolower($fileName), '.mp4')) {
+                        $videoUrl = "https://archive.org/download/{$identifier}" . $fileName;
+                        break;
+                    }
                 }
             }
         }
