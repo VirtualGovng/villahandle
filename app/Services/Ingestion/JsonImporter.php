@@ -58,15 +58,20 @@ class JsonImporter implements ImporterInterface
         $release_date_str = $metaData['metadata']['publicdate'][0] ?? $metaData['created'] ?? 'now';
         $release_date = date('Y-m-d', strtotime($release_date_str));
 
+        // --- THIS IS THE DEFINITIVE FIX ---
+        // Instead of checking a potentially missing 'format' key, we will now
+        // loop through the files and find one whose NAME ends with '.mp4'.
         $videoUrl = null;
         if (isset($metaData['files'])) {
             foreach ($metaData['files'] as $fileName => $fileInfo) {
-                if (isset($fileInfo['format']) && $fileInfo['format'] === 'MPEG4') {
+                // Check if the filename ends with .mp4, case-insensitive
+                if (str_ends_with(strtolower($fileName), '.mp4')) {
                     $videoUrl = "https://archive.org/download/{$identifier}/" . rawurlencode($fileName);
-                    break;
+                    break; // We found our video, stop looking.
                 }
             }
         }
+        // --- END OF FIX ---
         
         if (!$videoUrl) {
             echo " - Could not find a suitable MP4 file in the metadata. Skipping.\n";
@@ -83,7 +88,7 @@ class JsonImporter implements ImporterInterface
         
         $fp = fopen($localPath, 'w+');
         $ch_video = curl_init($videoUrl);
-        curl_setopt($ch_video, CURLOPT_TIMEOUT, 300); 
+        curl_setopt($ch_video, CURLOPT_TIMEOUT, 600); // Increased timeout for larger files
         curl_setopt($ch_video, CURLOPT_FILE, $fp); 
         curl_setopt($ch_video, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch_video);
