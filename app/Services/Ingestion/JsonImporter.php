@@ -59,28 +59,16 @@ class JsonImporter implements ImporterInterface
         $release_date = date('Y-m-d', strtotime($release_date_str));
 
         // --- THIS IS THE DEFINITIVE FIX ---
-        // The Internet Archive API returns the 'files' array in two different structures.
-        // This code now handles BOTH possible structures.
+        // The 'files' key contains an INDEXED ARRAY of file objects.
+        // We must loop through it as such and check the 'name' property of each object.
         $videoUrl = null;
         if (isset($metaData['files'])) {
-            // Heuristic: Check if the first key is numeric (0). If so, it's an indexed array.
-            if (isset($metaData['files'][0])) { 
-                // Handle Structure 1: Indexed Array (like for 'His Girl Friday')
-                // [ { "name": "/file.mp4", ... }, { ... } ]
-                foreach ($metaData['files'] as $fileInfo) {
-                    if (isset($fileInfo['name']) && str_ends_with(strtolower($fileInfo['name']), '.mp4')) {
-                        $videoUrl = "https://archive.org/download/{$identifier}" . $fileInfo['name'];
-                        break;
-                    }
-                }
-            } else {
-                // Handle Structure 2: Associative Array (like for 'Night of the Living Dead')
-                // { "/file.mp4": { ... }, "/file.jpg": { ... } }
-                foreach ($metaData['files'] as $fileName => $fileInfo) {
-                    if (str_ends_with(strtolower($fileName), '.mp4')) {
-                        $videoUrl = "https://archive.org/download/{$identifier}" . $fileName;
-                        break;
-                    }
+            foreach ($metaData['files'] as $fileInfo) { // Correctly loop through the indexed array
+                // Check if the 'name' key exists and ends with .mp4
+                if (isset($fileInfo['name']) && str_ends_with(strtolower($fileInfo['name']), '.mp4')) {
+                    $fileName = ltrim($fileInfo['name'], './'); // Remove the leading './'
+                    $videoUrl = "https://archive.org/download/{$identifier}/" . rawurlencode($fileName);
+                    break; // We found our video, stop looking.
                 }
             }
         }
@@ -105,8 +93,15 @@ class JsonImporter implements ImporterInterface
         curl_setopt($ch_video, CURLOPT_FILE, $fp); 
         curl_setopt($ch_video, CURLOPT_FOLLOWLOCATION, true);
         curl_exec($ch_video);
+        $http_code = curl_getinfo($ch_video, CURLINFO_HTTP_CODE);
         curl_close($ch_video);
         fclose($fp);
+
+        if ($http_code !== 200) {
+            echo " - Download failed with HTTP status code: {$http_code}. Skipping.\n";
+            unlink($localPath); // Delete the empty file
+            return;
+        }
 
         chmod($localPath, 0644); 
         chown($localPath, $this->webserverUser);
