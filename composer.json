@@ -1,0 +1,29 @@
+{
+    "name": "villahandle/villastudio",
+    "description": "VillaStudio - Legal Entertainment Discovery Platform",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "php": "^7.4|^8.0|^8.1|^8.2",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "require-dev": {},
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"if (!file_exists('.env')) copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php -r \"if (!file_exists('.env')) copy('.env.example', '.env');\""
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "name": "VillaStudio",
+    "short_name": "VillaStudio",
+    "description": "VillaStudio - Your Legal Entertainment Hub for Global Movies and African Stories.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f1014",
+    "theme_color": "#00aaff",
+    "icons": [
+        {
+            "src": "/public/images/icons/icon-192x192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "/public/images/icons/icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "/public/images/icons/maskable-icon-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ]
+}

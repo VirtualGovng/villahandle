@@ -1,0 +1,27 @@
+[
+    {
+        "identifier": "night_of_the_living_dead_1968",
+        "title": "Night of the Living Dead",
+        "genre": "Horror"
+    },
+    {
+        "identifier": "HisGirlFriday",
+        "title": "His Girl Friday",
+        "genre": "Comedy"
+    },
+    {
+        "identifier": "Charade1963",
+        "title": "Charade",
+        "genre": "Mystery"
+    },
+    {
+        "identifier": "TheGeneral_1927",
+        "title": "The General",
+        "genre": "Action"
+    },
+    {
+        "identifier": "Plan9fromOuterSpace_939",
+        "title": "Plan 9 from Outer Space",
+        "genre": "Sci-Fi"
+    }
+]

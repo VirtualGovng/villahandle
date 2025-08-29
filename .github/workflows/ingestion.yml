@@ -1,0 +1,26 @@
+name: Content Ingestion Cron Job
+
+on:
+  # Run this job automatically every day at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  # Allows you to run this workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+
+jobs:
+  ingest-content:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Ingestion Script on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /home/villahandle.com/public_html
+            /usr/bin/php cron/ingest.php json_importer
